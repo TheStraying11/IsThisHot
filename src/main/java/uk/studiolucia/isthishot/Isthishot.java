@@ -1,10 +1,22 @@
 package uk.studiolucia.isthishot;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -16,8 +28,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -61,17 +75,31 @@ public class Isthishot {
 
     private void setup(final FMLCommonSetupEvent event) {
         LOGGER.info("[IsThisHot]: Loaded Version "+net.minecraftforge.fml.ModList.get().getModFileById("isthishot").versionString());
+    }
 
-        final Collection<Fluid> values = ForgeRegistries.FLUIDS.getValues();
+    @SubscribeEvent
+    public void ItemTooltipEvent(final ItemTooltipEvent event) {
+        ItemStack itemStack = event.getItemStack();
+        List<Component> list = event.getToolTip();
 
-        for (Fluid fluid : values) {
-            String name = Objects.requireNonNull(fluid.getRegistryName()).toString();
-            if (!name.equals("minecraft:empty")) {
-                int temperature = fluid.getAttributes().getTemperature();
-                LOGGER.info("[IsThisHot]: Added temperature data to fluid: " + name + " (" + temperature + "K)");
-                // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
-                // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
+        itemStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(fluidContainer -> {
+            if (fluidContainer.getTanks() > 1) {
+                for (int i = 1; i <= fluidContainer.getTanks(); i++) {
+                    FluidStack fluid = fluidContainer.getFluidInTank(i);
+                    if (!fluid.isEmpty()) {
+                        int temperature = fluid.getFluid().getAttributes().getTemperature();
+
+                        list.add(new TextComponent("Temperature of " + fluidContainer.getFluidInTank(i).getDisplayName() + ": " + temperature + "K"));
+                    }
+                }
+            } else {
+                FluidStack fluid = fluidContainer.getFluidInTank(1);
+                if (!fluid.isEmpty()) {
+                    int temperature = fluid.getFluid().getAttributes().getTemperature();
+
+                    list.add(new TextComponent("Temperature: " + temperature + "K"));
+                }
             }
-        }
+        });
     }
 }
