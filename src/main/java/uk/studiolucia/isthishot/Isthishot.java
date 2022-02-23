@@ -3,6 +3,7 @@ package uk.studiolucia.isthishot;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -32,7 +33,10 @@ public class Isthishot {
                         () -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true
                 )
         );
+    }
 
+    @SubscribeEvent
+    private void FMLPostInitializationEvent() {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             clientSide();
         }
