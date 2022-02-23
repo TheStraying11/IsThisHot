@@ -35,6 +35,13 @@ public class Isthishot {
                         () -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true
                 )
         );
+
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            clientSide();
+        }
+        else {
+            serverSide();
+        }
     }
 
     private void clientSide() {
@@ -45,21 +52,6 @@ public class Isthishot {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-
-        final Collection<Fluid> values = ForgeRegistries.FLUIDS.getValues();
-
-        for (Fluid fluid : values) {
-            String name = Objects.requireNonNull(fluid.getRegistryName()).toString();
-            if (!name.equals("minecraft:empty")) {
-                int temperature = fluid.getAttributes().getTemperature();
-                LOGGER.info("Added temperature data to fluid: " + name + " (" + temperature + "K)");
-                // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
-                for (Object tag : fluid.getBucket().getTags().toArray()) {
-                    LOGGER.info("[IsThisHot]: "+tag);
-                }
-                // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
-            }
-        }
     }
 
     private void serverSide() {
@@ -69,11 +61,17 @@ public class Isthishot {
 
     private void setup(final FMLCommonSetupEvent event) {
         LOGGER.info("[IsThisHot]: Loaded Version "+net.minecraftforge.fml.ModList.get().getModFileById("isthishot").versionString());
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            clientSide();
-        }
-        else {
-            serverSide();
+
+        final Collection<Fluid> values = ForgeRegistries.FLUIDS.getValues();
+
+        for (Fluid fluid : values) {
+            String name = Objects.requireNonNull(fluid.getRegistryName()).toString();
+            if (!name.equals("minecraft:empty")) {
+                int temperature = fluid.getAttributes().getTemperature();
+                LOGGER.info("Added temperature data to fluid: " + name + " (" + temperature + "K)");
+                // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
+                // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
+            }
         }
     }
 }
