@@ -12,7 +12,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 
 group = 'uk.studiolucia'
-version = '1.0'
+version = '1.18.1-0.1'
 
 java {
     archivesBaseName = 'isthishot'
