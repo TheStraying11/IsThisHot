@@ -1,5 +1,6 @@
 package uk.studiolucia.isthishot;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -35,17 +37,6 @@ public class Isthishot {
         );
     }
 
-    @SubscribeEvent
-    private void FMLPostInitializationEvent() {
-        // Enforce client-side only
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            clientSide();
-        }
-        else {
-            serverSide();
-        }
-    }
-
     private void clientSide() {
         LOGGER.debug("[IsThisHot]: Running On Client");
 
@@ -63,6 +54,9 @@ public class Isthishot {
                 int temperature = fluid.getAttributes().getTemperature();
                 LOGGER.info("Added temperature data to fluid: " + name + " (" + temperature + "K)");
                 // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
+                for (Object tag : fluid.getBucket().getTags().toArray()) {
+                    LOGGER.info("[IsThisHot]: "+tag);
+                }
                 // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
             }
         }
@@ -75,5 +69,11 @@ public class Isthishot {
 
     private void setup(final FMLCommonSetupEvent event) {
         LOGGER.info("[IsThisHot]: Loaded Version "+net.minecraftforge.fml.ModList.get().getModFileById("isthishot").versionString());
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            clientSide();
+        }
+        else {
+            serverSide();
+        }
     }
 }
