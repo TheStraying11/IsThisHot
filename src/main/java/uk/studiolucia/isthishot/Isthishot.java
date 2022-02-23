@@ -1,5 +1,6 @@
 package uk.studiolucia.isthishot;
 
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
@@ -9,8 +10,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkConstants;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Collection;
+import java.util.Objects;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("isthishot")
@@ -44,6 +49,18 @@ public class Isthishot {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+
+        final Collection<Fluid> values = ForgeRegistries.FLUIDS.getValues();
+
+        for (Fluid fluid : values) {
+            String name = Objects.requireNonNull(fluid.getRegistryName()).toString();
+            if (!name.equals("minecraft:empty")) {
+                int temperature = fluid.getAttributes().getTemperature();
+                LOGGER.info("Added temperature data to fluid: " + name + " (" + temperature + "K)");
+                // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
+                // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
+            }
+        }
     }
 
     private void serverSide() {
