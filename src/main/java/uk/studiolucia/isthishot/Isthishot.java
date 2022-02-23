@@ -37,6 +37,7 @@ public class Isthishot {
 
     @SubscribeEvent
     private void FMLPostInitializationEvent() {
+        // Enforce client-side only
         if (FMLEnvironment.dist == Dist.CLIENT) {
             clientSide();
         }
