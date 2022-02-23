@@ -52,6 +52,6 @@ public class Isthishot {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        LOGGER.info("[IsThisHot]: Loaded Version "+net.minecraftforge.fml.ModList.get().getModObjectById("isthishot").toString());
+        LOGGER.info("[IsThisHot]: Loaded Version "+net.minecraftforge.fml.ModList.get().getModFileById("isthishot").versionString());
     }
 }
