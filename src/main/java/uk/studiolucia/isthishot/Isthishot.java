@@ -68,7 +68,7 @@ public class Isthishot {
             String name = Objects.requireNonNull(fluid.getRegistryName()).toString();
             if (!name.equals("minecraft:empty")) {
                 int temperature = fluid.getAttributes().getTemperature();
-                LOGGER.info("Added temperature data to fluid: " + name + " (" + temperature + "K)");
+                LOGGER.info("[IsThisHot]: Added temperature data to fluid: " + name + " (" + temperature + "K)");
                 // TODO: figure out how to actually get an instance of TooltipLines (need Player and TooltipFlags Instances)
                 // fluid.getBucket().getDefaultInstance().getTooltipLines(Player, TooltipFlags).add("Temperature: "+temperature+"K");
             }
